@@ -1,4 +1,4 @@
-name: RDP Tailscale
+name: RDP Tailscale Windows
 
 on: [workflow_dispatch]
 
@@ -16,9 +16,15 @@ jobs:
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name 'UserAuthentication' -Value 0
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 
-      - name: Install and Connect Tailscale
-        uses: tailscale/github-action@v2
-        with:
-          authkey: tskey-auth-kz3dgPNpRG11CNTRL-afCi5UivjyLqD6ubaD8PyLCsswwU6eE6F
-          version: latest
-          args: --hostname=windows-rdp --accept-routes
+      - name: Install and Start Tailscale
+        shell: powershell
+        run: |
+          # تحميل وتثبيت Tailscale على الويندوز صامتًا
+          Invoke-WebRequest -Uri "https://pkgs.tailscale.com/stable/tailscale-setup-latest.exe" -OutFile "tailscale-setup.exe"
+          Start-Process -FilePath "tailscale-setup.exe" -ArgumentList "/quiet" -Wait
+          
+          # الانتظار قليلًا حتى تبدأ الخدمة ثم تسجيل الدخول بالمفتاح
+          Start-Sleep -Seconds 5
+          & "C:\Program Files\Tailscale\tailscale.exe" up --authkey=tskey-auth-kz3dgPNpRG11CNTRL-afCi5UivjyLqD6ubaD8PyLCsswwU6eE6F --hostname=windows-rdp
+          
+          Write-Host "Tailscale connected successfully!"
