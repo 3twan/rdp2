@@ -1,5 +1,4 @@
-
-name: RDP Serveo
+name: RDP Pinggy
 
 on: [workflow_dispatch]
 
@@ -17,9 +16,8 @@ jobs:
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name 'UserAuthentication' -Value 0
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 
-      - name: Start Serveo Tunnel
+      - name: Start Pinggy Tunnel
         shell: bash
         run: |
-          echo "Starting Serveo tunnel for RDP..."
-          # هذا الأمر يقوم بفتح نفق TCP عبر Serveo على منفذ 3389
-          ssh -o StrictHostKeyChecking=no -R 0:localhost:3389 serveo.net
+          echo "Starting Pinggy TCP tunnel..."
+          ssh -p 80 -o StrictHostKeyChecking=no -R0:localhost:3389 tcp@a.pinggy.io
