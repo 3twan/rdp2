@@ -1,0 +1,23 @@
+name: RDP Cloudflare
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Enable RDP
+        shell: powershell
+        run: |
+          net user atwan 6827.Nnnn /add
+          net localgroup administrators atwan /add
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name 'UserAuthentication' -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+      - name: Download and Start Cloudflare Tunnel
+        shell: powershell
+        run: |
+          Invoke-WebRequest https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe -OutFile cloudflared.exe
+          ./cloudflared.exe tunnel --url rdp://localhost:3389
