@@ -1,4 +1,4 @@
-name: RDP Cloudflare
+name: RDP Tailscale
 
 on: [workflow_dispatch]
 
@@ -16,8 +16,9 @@ jobs:
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name 'UserAuthentication' -Value 0
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 
-      - name: Download and Start Cloudflare Tunnel
-        shell: powershell
-        run: |
-          Invoke-WebRequest https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe -OutFile cloudflared.exe
-          ./cloudflared.exe tunnel --url rdp://localhost:3389
+      - name: Install and Connect Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: tskey-auth-kz3dgPNpRG11CNTRL-afCi5UivjyLqD6ubaD8PyLCsswwU6eE6F
+          version: latest
+          args: --hostname=windows-rdp --accept-routes
